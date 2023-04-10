@@ -21,14 +21,14 @@ const loginPost = async (ctx, next) => {
       console.log('success')
       ctx.redirect('/datos')
     } else {
-      console.log('fail')
-      ctx.redirect('/faillogin')
+      ctx.redirect('/login/faillogin')
     }
   })(ctx, next)
 }
 
 const faillogin = async (ctx, next) => {
-  await ctx.render('login-error.ejs')
+  console.log('faillogin');
+  await ctx.render('login-error')
 }
 
-export default { login, faillogin, loginPost }
+export default { login, loginPost, faillogin }

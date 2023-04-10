@@ -31,7 +31,7 @@ const validatePassword = (user, password) => {
 
 passport.use(
   'register',
-  new LocalStrategy(options, (ctx, username, password, done) => {
+  new LocalStrategy(options, (username, password, done) => {
     usuariosDAO
       .getByUsername(username)
       .then((user) => {
@@ -39,14 +39,15 @@ passport.use(
           console.log('User already exists')
           return done(null, false)
         } else {
-          // const { direccion } = ctx.request.body
-          const salt = bCrypt.genSaltSync(10)
+          const salt = bCrypt.genSaltSync(10); // 10 is the number of rounds
+
           const hash = bCrypt.hashSync(password, salt)
 
           const newUser = {
             username: username,
             password: hash,
-            direccion: ctx.request.body.direccion,
+            direccion: 'prueba',
+            // direccion: ctx.request.body.direccion,
           }
           usuariosDAO
             .save(newUser)
@@ -61,10 +62,11 @@ passport.use(
       })
       .catch((error) => {
         console.log('Error in SignUp: ' + error)
-        return done(error)
+        done(error)
       })
   }),
-)
+);
+
 
 passport.use(
   'login',

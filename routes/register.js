@@ -6,9 +6,9 @@ const router = new Router()
 
 // router.use(authRouter)
 
-router.get('/register', controller.register)
+router.get('/', controller.register)
 
-router.post('/register', controller.registerPost)
+router.post('/', controller.registerPost)
 
 router.get('/failregister', controller.failregister)
 

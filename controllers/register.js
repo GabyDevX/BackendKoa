@@ -18,17 +18,23 @@ const registerPost = async (ctx, next) => {
 
   return passport.authenticate(
     'register',
-    (ctx, err, user, info, status, done) => {
+    (err, user) => {
+      if (err) {
+        console.log('Error in SignUp: ' + err)
+        ctx.redirect('/failregister')
+        return
+      }
       if (user) {
         ctx.login(user)
         ctx.redirect('/')
       } else {
         console.log('fail')
-        ctx.redirect('/failregister')
+        ctx.redirect('/register/failregister')
       }
     },
   )(ctx, next)
 }
+
 
 const failregister = async (ctx) => {
   await ctx.render('register-error.ejs')
