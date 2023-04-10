@@ -36,9 +36,6 @@ if (cluster.isMaster) {
 } else {
   const app = new Koa()
 
-  const envPort = parseInt(process.argv[2]) || 8080
-  const PORT = process.env.PORT || envPort
-
   app.listen(PORT, () => {
     logger.info(`Servidor escuchando el puerto ${PORT} - PID: ${process.pid}`)
   })
@@ -59,7 +56,7 @@ app.use(
 app.use(serve('./public'))
 app.use(bodyParser())
 app.use(compress())
-// app.use(koaCookie())
+// app.use(koaCookie());
 app.keys = ['super-secret-key']
 app.use(session(app))
 
@@ -74,26 +71,26 @@ app.use(routes.routes())
 // app.use(async (ctx, next) => {
 //   logger.info(`
 //     Ruta consultada: ${ctx.originalUrl}
-//     Metodo ${ctx.method}`)
-//   await next()
+//     Metodo ${ctx.method}`);
+//   await next();
 // })
 
 // app.use(async (ctx, next) => {
 //   logger.warn(`
 //     Estado: 404
 //     Ruta consultada: ${ctx.originalUrl}
-//     Metodo ${ctx.method}`)
+//     Metodo ${ctx.method}`);
 
-//   ctx.status = 404
+//   ctx.status = 404;
 //   ctx.body = {
 //     error: -2,
 //     descripcion: `ruta ${ctx.originalUrl} metodo ${ctx.method} no implementada`,
-//   }
+//   };
 
-//   await next()
+//   await next();
 // })
 
-ioController.startChatServer(app, io)
+ioController.startChatServer(app, io) // Move this call here after MongoDB connection is established
 
 app.listen(PORT, async () => {
   console.log('Servidor escuchando en el puerto ' + PORT)
