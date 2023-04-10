@@ -1,5 +1,6 @@
 import ApiProductosMock from '../api/productos.js'
 import service from '../services/datos.js'
+import { User } from '../models/usuario.js'
 
 const apiProductos = new ApiProductosMock()
 
@@ -8,7 +9,7 @@ const datos = async (ctx) => {
   const productosFaker = await apiProductos.popular()
 
   //Sacar a service
-  const usuario = service.getUser
+  const usuario = await service.getUser(ctx)
 
   await ctx.render('inicio', {
     datos: usuario,

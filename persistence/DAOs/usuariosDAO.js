@@ -36,8 +36,8 @@ class UsuariosDAOMongoDB {
       const usuario = await usuariosModel.User.findOne({
         username: username,
       });
-
-      return transformarADTO(usuario);
+       
+      return usuario ? transformarADTO(usuario) : null;
     } catch (error) {
       console.log(error);
     }

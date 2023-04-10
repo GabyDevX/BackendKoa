@@ -2,7 +2,7 @@ import Koa from 'koa'
 import { Server as HttpServer } from 'http'
 import { Server as IOServer } from 'socket.io'
 import bodyParser from 'koa-bodyparser'
-import koaCookie from 'koa-cookie'
+import serve from 'koa-static'
 import dotenv from 'dotenv'
 import cluster from 'cluster'
 import compress from 'koa-compress'
@@ -14,6 +14,7 @@ import ioController from './controllers/ioController.js'
 import views from 'koa-views'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import session from 'koa-session'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -47,40 +48,50 @@ const app = new Koa()
 const httpServer = new HttpServer(app)
 const io = new IOServer(httpServer)
 
-app.use(views(__dirname + '/public/views', { extension: 'ejs' }))
+app.use(
+  views('public/views', {
+    map: {
+      html: 'ejs', // render .html files with the ejs engine
+    },
+    extension: 'ejs', // use the ejs engine by default
+  }),
+)
+app.use(serve('./public'))
 app.use(bodyParser())
 app.use(compress())
 // app.use(koaCookie())
+app.keys = ['super-secret-key']
+app.use(session(app))
 
 app.use(routes.routes())
 
-app.use(
-  views('./public/views', {
-    extension: 'ejs',
-  }),
-)
+// app.use(
+//   views('./public/views', {
+//     extension: 'ejs',
+//   }),
+// )
 
-app.use(async (ctx, next) => {
-  logger.info(`
-    Ruta consultada: ${ctx.originalUrl}
-    Metodo ${ctx.method}`)
-  await next()
-})
+// app.use(async (ctx, next) => {
+//   logger.info(`
+//     Ruta consultada: ${ctx.originalUrl}
+//     Metodo ${ctx.method}`)
+//   await next()
+// })
 
-app.use(async (ctx, next) => {
-  logger.warn(`
-    Estado: 404
-    Ruta consultada: ${ctx.originalUrl}
-    Metodo ${ctx.method}`)
+// app.use(async (ctx, next) => {
+//   logger.warn(`
+//     Estado: 404
+//     Ruta consultada: ${ctx.originalUrl}
+//     Metodo ${ctx.method}`)
 
-  ctx.status = 404
-  ctx.body = {
-    error: -2,
-    descripcion: `ruta ${ctx.originalUrl} metodo ${ctx.method} no implementada`,
-  }
+//   ctx.status = 404
+//   ctx.body = {
+//     error: -2,
+//     descripcion: `ruta ${ctx.originalUrl} metodo ${ctx.method} no implementada`,
+//   }
 
-  await next()
-})
+//   await next()
+// })
 
 ioController.startChatServer(app, io)
 

@@ -10,28 +10,25 @@ const login = async (ctx, next) => {
   if (ctx.isAuthenticated()) {
     ctx.redirect('/datos')
   } else {
-    const loginPagePath = path.resolve(
-      __dirname,
-      '..',
-      'public',
-      'views',
-      'login.html',
-    )
-    await send(ctx, loginPagePath)
+    await ctx.render('login.html')
   }
 }
 
-const loginPost = passport.authenticate('login', (err, user, info, status) => {
-  if (user) {
-    ctx.login(user)
-    ctx.redirect('/datos')
-  } else {
-    ctx.redirect('/faillogin')
-  }
-})(ctx)
+const loginPost = async (ctx, next) => {
+  return passport.authenticate('login', (err, user, info, status) => {
+    if (user) {
+      ctx.login(user)
+      console.log('success')
+      ctx.redirect('/datos')
+    } else {
+      console.log('fail')
+      ctx.redirect('/faillogin')
+    }
+  })(ctx, next)
+}
 
 const faillogin = async (ctx, next) => {
-  await ctx.render('login-error')
+  await ctx.render('login-error.ejs')
 }
 
 export default { login, faillogin, loginPost }

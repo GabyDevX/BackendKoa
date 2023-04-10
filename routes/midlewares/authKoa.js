@@ -1,6 +1,4 @@
 import passport from 'koa-passport'
-// CONNECT DB
-import MongoStore from 'koa-session-mongoose'
 import bCrypt from 'bcrypt'
 
 import UsuariosFactory from '../../persistence/Factories/UsuariosDAOFactory.js'
@@ -26,10 +24,50 @@ passport.deserializeUser((id, done) => {
 })
 
 const validatePassword = (user, password) => {
+  console.log(user)
+  console.log(password)
   return bCrypt.compareSync(password, user.password)
 }
 
 passport.use(
+  'register',
+  new LocalStrategy(options, (ctx, username, password, done) => {
+    usuariosDAO
+      .getByUsername(username)
+      .then((user) => {
+        if (user) {
+          console.log('User already exists')
+          return done(null, false)
+        } else {
+          // const { direccion } = ctx.request.body
+          const salt = bCrypt.genSaltSync(10)
+          const hash = bCrypt.hashSync(password, salt)
+
+          const newUser = {
+            username: username,
+            password: hash,
+            direccion: ctx.request.body.direccion,
+          }
+          usuariosDAO
+            .save(newUser)
+            .then((savedUser) => {
+              return done(null, savedUser)
+            })
+            .catch((error) => {
+              console.log('Error in SignUp: ' + error)
+              return done(error)
+            })
+        }
+      })
+      .catch((error) => {
+        console.log('Error in SignUp: ' + error)
+        return done(error)
+      })
+  }),
+)
+
+passport.use(
+  'login',
   new LocalStrategy(options, (username, password, done) => {
     usuariosDAO
       .getByUsername(username)
@@ -38,16 +76,15 @@ passport.use(
           console.log('User Not Found with username ' + username)
           return done(null, false)
         }
-        if (!validatePassword(password, user.password)) {
+        if (!validatePassword(user, password)) {
           return done(null, false)
         } else {
           return done(null, user)
         }
       })
       .catch((err) => {
+        console.log('entre al error')
         return done(err)
       })
   }),
 )
-
-

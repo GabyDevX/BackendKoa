@@ -1,11 +1,11 @@
 import { User } from '../models/usuario.js'
 
-const getUser = async (ctx, next) => {
-  const usuario = await User.findOne({ username: ctx.state.user.username })
+const getUser = async (ctx) => {
+  const usuario = await User.findOne({ username: ctx.state.user[0].username })
 
   ctx.state.usuario = usuario
 
-  await next()
+  return usuario
 }
 
-export default getUser
+export default { getUser }

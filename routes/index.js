@@ -1,5 +1,5 @@
 import Router from 'koa-router'
-import authRouter from './midlewares/auth.js'
+// import authRouter from './midlewares/auth.js'
 import datosRouter from './datos.js'
 import infoRouter from './info.js'
 import loginRouter from './login.js'
@@ -16,8 +16,6 @@ const router = new Router()
 import session from 'koa-session'
 import passport from 'koa-passport'
 import bodyParser from 'koa-bodyparser'
-import RedisStore from 'koa-redis'
-
 router.keys = ['super-secret-key']
 // router.use(session(router))
 
@@ -25,14 +23,7 @@ router.use(bodyParser())
 
 import './midlewares/authKoa.js'
 
-router.use(
-  session(
-    {
-      store: new RedisStore(),
-    },
-    router,
-  ),
-)
+// router.use(session({ maxAge: 60000 }, router))
 
 router.use(passport.initialize())
 router.use(passport.session())
